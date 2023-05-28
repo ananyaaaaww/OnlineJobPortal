@@ -1,56 +1,34 @@
 <?php
 session_start();
-error_reporting(0);
+//error_reporting(0);
 include('includes/dbconnection.php');
-error_reporting(0);
 if (strlen($_SESSION['jpaid']==0)) {
   header('location:logout.php');
   } else{
+    
 if(isset($_POST['submit']))
 {
-$adminid=$_SESSION['jpaid'];
-$cpassword=md5($_POST['currentpassword']);
-$newpassword=md5($_POST['newpassword']);
-$sql ="SELECT ID FROM tbladmin WHERE ID=:adminid and Password=:cpassword";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
+$category=$_POST['category'];
+$description=$_POST['description'];
+$editid=$_GET['editid'];
 
-if($query -> rowCount() > 0)
-{
-$con="update tbladmin set Password=:newpassword where ID=:adminid";
-$chngpwd1 = $dbh->prepare($con);
-$chngpwd1-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-$chngpwd1->execute();
-
-echo '<script>alert("Your password successully changed")</script>';
-} else {
-echo '<script>alert("Your current password is wrong")</script>';
-
+$sql="update tblcategory set CategoryName=:category,Description=:description where id=:editid";
+$query=$dbh->prepare($sql);
+$query->bindParam(':category',$category,PDO::PARAM_STR);
+$query->bindParam(':description',$description,PDO::PARAM_STR);
+$query->bindParam(':editid',$editid,PDO::PARAM_STR);
+$query->execute();
+echo '<script>alert("Category Updated successfully .")</script>';
+echo "<script>window.location.href ='manage-category.php'</script>";
 }
-}
- ?>
+
+?>
 <!doctype html>
  <html lang="en" class="no-focus"> <!--<![endif]-->
     <head>
- <title>Job Portal - Change Password</title>
+ <title>Job Portal - Edit Category</title>
 <link rel="stylesheet" id="css-main" href="assets/css/codebase.min.css">
-<script type="text/javascript">
-function checkpass()
-{
-if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
-{
-alert('New Password and Confirm Password field does not match');
-document.changepassword.confirmpassword.focus();
-return false;
-}
-return true;
-}   
 
-</script>
 </head>
     <body>
         <div id="page-container" class="sidebar-o sidebar-inverse side-scroll page-header-fixed main-content-narrow">
@@ -66,44 +44,53 @@ return true;
                 <div class="content">
                 
                     <!-- Register Forms -->
-                    <h2 class="content-heading">Change Password</h2>
+                    <h2 class="content-heading">Edit Category</h2>
                     <div class="row">
                         <div class="col-md-12">
                             <!-- Bootstrap Register -->
                             <div class="block block-themed">
                                 <div class="block-header bg-gd-emerald">
-                                    <h3 class="block-title">Change Password</h3>
-                                  
+                                    <h3 class="block-title">Edit Category</h3>
+                                 
                                 </div>
                                 <div class="block-content">
-                                    <form method="post" onsubmit="return checkpass();" name="changepassword">
+                                   
+                                    <form method="post">
+                                      <?php
+                  $editid=$_GET['editid'];
+$sql="SELECT * from tblcategory where id=:editid";
+$query = $dbh -> prepare($sql);
+$query->bindParam(':editid',$editid,PDO::PARAM_STR);
+$query->execute();
+$results=$query->fetchAll(PDO::FETCH_OBJ);
+
+$cnt=1;
+if($query->rowCount() > 0)
+{
+foreach($results as $row)
+{               ?>  
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-username">Current Password:</label>
+                                            <label class="col-12" for="register1-email">Category:</label>
                                             <div class="col-12">
-                                                <input type="password" class="form-control" name="currentpassword" id="currentpassword"required='true'>
+                                                <input type="text" class="form-control" value="<?php echo htmlentities($row->CategoryName);?>" name="category" required="true">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-email">New Password:</label>
+                                            <label class="col-12" for="register1-email">Category Description:</label>
                                             <div class="col-12">
-                                                 <input type="password" class="form-control" name="newpassword"  class="form-control" required="true">
+                                                 <textarea class="form-control" rows="5" name="description" required="true"><?php echo htmlentities($row->Description);?></textarea>
                                             </div>
                                         </div>
-                                        <div class="form-group row">
-                                            <label class="col-12" for="register1-password">Confirm Password:</label>
-                                            <div class="col-12">
-                                                <input type="password" class="form-control"  name="confirmpassword" id="confirmpassword"  required='true'>
-                                            </div>
-                                        </div>
-                                      
+                                      <?php $cnt=$cnt+1;}} ?> 
                                         <div class="form-group row">
                                             <div class="col-12">
                                                 <button type="submit" class="btn btn-alt-success" name="submit">
-                                                    <i class="fa fa-plus mr-5"></i> Change
+                                                    <i class="fa fa-plus mr-5"></i> Update
                                                 </button>
                                             </div>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                             <!-- END Bootstrap Register -->

@@ -2,55 +2,45 @@
 session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
-error_reporting(0);
 if (strlen($_SESSION['jpaid']==0)) {
   header('location:logout.php');
   } else{
-if(isset($_POST['submit']))
-{
-$adminid=$_SESSION['jpaid'];
-$cpassword=md5($_POST['currentpassword']);
-$newpassword=md5($_POST['newpassword']);
-$sql ="SELECT ID FROM tbladmin WHERE ID=:adminid and Password=:cpassword";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
+    if(isset($_POST['submit']))
+  {
 
-if($query -> rowCount() > 0)
-{
-$con="update tbladmin set Password=:newpassword where ID=:adminid";
-$chngpwd1 = $dbh->prepare($con);
-$chngpwd1-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-$chngpwd1->execute();
 
-echo '<script>alert("Your password successully changed")</script>';
-} else {
-echo '<script>alert("Your current password is wrong")</script>';
+$category=$_POST['category'];
+$description=$_POST['description'];
 
+
+$sql="insert into tblcategory(CategoryName,Description)values(:category,:description)";
+$query=$dbh->prepare($sql);
+$query->bindParam(':category',$category,PDO::PARAM_STR);
+$query->bindParam(':description',$description,PDO::PARAM_STR);
+
+
+ $query->execute();
+
+   $LastInsertId=$dbh->lastInsertId();
+   if ($LastInsertId>0) {
+    echo '<script>alert("Category has been created.")</script>';
+echo "<script>window.location.href ='manage-category.php'</script>";
+  }
+  else
+    {
+         echo '<script>alert("Something Went Wrong. Please try again")</script>';
+    }
+
+  
 }
-}
- ?>
+
+?>
 <!doctype html>
  <html lang="en" class="no-focus"> <!--<![endif]-->
     <head>
- <title>Job Portal - Change Password</title>
+ <title>Job Portal - Add Category</title>
 <link rel="stylesheet" id="css-main" href="assets/css/codebase.min.css">
-<script type="text/javascript">
-function checkpass()
-{
-if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
-{
-alert('New Password and Confirm Password field does not match');
-document.changepassword.confirmpassword.focus();
-return false;
-}
-return true;
-}   
 
-</script>
 </head>
     <body>
         <div id="page-container" class="sidebar-o sidebar-inverse side-scroll page-header-fixed main-content-narrow">
@@ -66,44 +56,41 @@ return true;
                 <div class="content">
                 
                     <!-- Register Forms -->
-                    <h2 class="content-heading">Change Password</h2>
+                    <h2 class="content-heading">Add Category</h2>
                     <div class="row">
                         <div class="col-md-12">
                             <!-- Bootstrap Register -->
                             <div class="block block-themed">
                                 <div class="block-header bg-gd-emerald">
-                                    <h3 class="block-title">Change Password</h3>
-                                  
+                                    <h3 class="block-title">Add Category</h3>
+                                   
                                 </div>
                                 <div class="block-content">
-                                    <form method="post" onsubmit="return checkpass();" name="changepassword">
+                                   
+                                    <form method="post">
+                                        
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-username">Current Password:</label>
+                                            <label class="col-12" for="register1-email">Category:</label>
                                             <div class="col-12">
-                                                <input type="password" class="form-control" name="currentpassword" id="currentpassword"required='true'>
+                                                <input type="text" class="form-control" value="" name="category" required="true">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-email">New Password:</label>
+                                            <label class="col-12" for="register1-email">Category Description:</label>
                                             <div class="col-12">
-                                                 <input type="password" class="form-control" name="newpassword"  class="form-control" required="true">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-12" for="register1-password">Confirm Password:</label>
-                                            <div class="col-12">
-                                                <input type="password" class="form-control"  name="confirmpassword" id="confirmpassword"  required='true'>
+                                                 <textarea class="form-control" rows="5" name="description" required="true"></textarea>
                                             </div>
                                         </div>
                                       
                                         <div class="form-group row">
                                             <div class="col-12">
                                                 <button type="submit" class="btn btn-alt-success" name="submit">
-                                                    <i class="fa fa-plus mr-5"></i> Change
+                                                    <i class="fa fa-plus mr-5"></i> Add
                                                 </button>
                                             </div>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                             <!-- END Bootstrap Register -->

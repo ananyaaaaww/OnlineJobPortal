@@ -1,179 +1,153 @@
 <?php
- session_start();
-//Database Configuration File
-include('includes/config.php');
+session_start();
 error_reporting(0);
-if(isset($_POST['signin']))
-  {
- 
-    // Getting post values
-    $email=$_POST['emailid'];
-    $mobile=$_POST['mobileno'];
-    $password=$_POST['password'];
-    //new password hasing 
-$options = ['cost' => 12];
-$hashednewpass=password_hash($password, PASSWORD_BCRYPT, $options);
-    // Fetch data from database on the basis of email and mobile
-    $sql ="SELECT id FROM tbljobseekers WHERE (EmailId=:email and ContactNumber=:mobile)";
-    $query= $dbh -> prepare($sql);
-    $query-> bindParam(':email', $email, PDO::PARAM_STR);
-    $query-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
-    $query-> execute();
-    $results=$query->fetchAll(PDO::FETCH_OBJ);
-if($query->rowCount() > 0)
-{
-$sql="update  tbljobseekers set Password=:hashednewpass WHERE (EmailId=:email and ContactNumber=:mobile)";
-$query = $dbh->prepare($sql);
-// Binding Post Values
-$query->bindParam(':hashednewpass',$hashednewpass,PDO::PARAM_STR);
-$query-> bindParam(':email', $email, PDO::PARAM_STR);
-    $query-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
-$query->execute();
-echo "<script>alert('Password chnaged successfully');</script>";
-echo "<script type='text/javascript'> document.location ='sign-in.php'; </script>";
+include('includes/dbconnection.php');
 
+if(isset($_POST['submit']))
+  {
+    $email=$_POST['email'];
+$mobile=$_POST['mobile'];
+$newpassword=md5($_POST['newpassword']);
+  $sql ="SELECT Email FROM tbladmin WHERE Email=:email and MobileNumber=:mobile";
+$query= $dbh -> prepare($sql);
+$query-> bindParam(':email', $email, PDO::PARAM_STR);
+$query-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
+$query-> execute();
+$results = $query -> fetchAll(PDO::FETCH_OBJ);
+if($query -> rowCount() > 0)
+{
+$con="update tbladmin set Password=:newpassword where Email=:email and MobileNumber=:mobile";
+$chngpwd1 = $dbh->prepare($con);
+$chngpwd1-> bindParam(':email', $email, PDO::PARAM_STR);
+$chngpwd1-> bindParam(':mobile', $mobile, PDO::PARAM_STR);
+$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
+$chngpwd1->execute();
+echo "<script>alert('Your Password succesfully changed');</script>";
 }
-//if username or email not found in database
-else{
-echo "<script>alert('Invalid details. Please try again');</script>";
-  }
- 
+else {
+echo "<script>alert('Email id or Mobile no is invalid');</script>"; 
 }
+}
+
 ?>
 
 <!doctype html>
-
-<html>
-
-<head>
-<title>JobSeeker Reset Your Account Password | Job Portal</title>
-
-<link href="css/custom.css" rel="stylesheet" type="text/css">
-<link href="css/bootstrap.css" rel="stylesheet" type="text/css">
-<link href="css/color.css" rel="stylesheet" type="text/css">
-<link href="css/responsive.css" rel="stylesheet" type="text/css">
-<link href="css/owl.carousel.css" rel="stylesheet" type="text/css">
-<link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
-<link href="css/jquery.mCustomScrollbar.css" rel="stylesheet" type="text/css">
-<link href='https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,500,700,900' rel='stylesheet' type='text/css'>
-<script type="text/javascript">
-function checkpass()
+<html lang="en" class="no-focus"> <!--<![endif]-->
+    <head>       
+        <title>Job Portal - Forgot Page</title>
+        <link rel="stylesheet" id="css-main" href="assets/css/codebase.min.css">
+        <script type="text/javascript">
+function valid()
 {
-if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
+if(document.chngpwd.newpassword.value!= document.chngpwd.confirmpassword.value)
 {
-alert('New Password and Confirm Password field does not match');
-document.changepassword.confirmpassword.focus();
+alert("New Password and Confirm Password Field do not match  !!");
+document.chngpwd.confirmpassword.focus();
 return false;
 }
 return true;
-}   
-
+}
 </script>
-</head>
-
-
-
-<body class="theme-style-1">
-
-<!--WRAPPER START-->
-
-<div id="wrapper"> 
-
- <?php include('includes/header.php');?>
-  <!--HEADER END--> 
-
-  <section id="inner-banner">
-    <div class="container">
-      <h1>Reset Your Account Password</h1>
-    </div>
-  </section>
-
-
-
-  
-
-  <!--MAIN START-->
-
-  <div id="main"> 
-    <!--SIGNUP SECTION START-->
-
-    <section class="signup-section">
-
-      <div class="container">
-
-        <div class="holder">
-
-          <div class="thumb"><img src="images/account.png" alt="img"></div>
-
-          <form method="post" name="changepassword" onsubmit="return checkpass();">
-
-            <div class="input-box"> <i class="fa fa-envelope-square"></i>
-
-<input type="text" placeholder="Registered Email id" name="emailid"  autocomplete="off" required>
-
-            </div>
-
- <div class="input-box"> <i class="fa fa-phone"></i>
-
-<input type="text" placeholder="Registered mobile number" name="mobileno"  autocomplete="off" required>
-
-            </div>
-
-            <div class="input-box"> <i class="fa fa-unlock"></i>
-<input type="password" class="form-control" name="password" id="newpassword" required placeholder="New Password">
-
-            </div>
-
-   <div class="input-box"> <i class="fa fa-unlock"></i>
-<input type="password" class="form-control" name="password" id="confirmpassword" required placeholder="Confirm Password">
-
-            </div>
-          
-<div class="input-box"> 
-       <input type="submit" value="Sign in" name="signin">
-     </div>
-
-            <b>OR</b>
-
-            <div class="login-social">
-              <em>If already have an Account? <a href="sign-in.php">SIGN IN NOW</a></em> </div>
-
-          </form>
-<a href="index.php"><i class="fa fa-home" aria-hidden="true" style="font-size: 30px;padding-top: 10px"></i>  Back Home!!!</a>
+    </head>
+    <body>
+      
+        <div id="page-container" class="main-content-boxed">
+            <!-- Main Container -->
+            <main id="main-container">
+                <!-- Page Content -->
+                <div class="bg-image" style="background-image: url('assets/img/photos/photo34@2x.jpg');">
+                    <div class="row mx-0 bg-black-op">
+                        <div class="hero-static col-md-6 col-xl-6 d-none d-md-flex align-items-md-end">
+                            <div class="p-30 invisible" data-toggle="appear">
+                                <p class="font-size-h3 font-w600 text-white">
+                                   Job Portal.
+                                </p>
+                 
+                            </div>
+                        </div>
+                        <div class="hero-static col-md-6 col-xl-6 d-flex align-items-center bg-white invisible" data-toggle="appear" data-class="animated fadeInRight">
+                            <div class="content content-full">
+                                <!-- Header -->
+                                <div class="px-30 py-10">
+                                    <a class="link-effect font-w700" href="index.php">
+                                        <span class="font-size-xl">JOBPORTAL</span>
+                                    </a>
+                                    <h1 class="h3 font-w700 mt-30 mb-10">Don’t worry, we’ve got your back</h1>
+                                    <h2 class="h5 font-w400 text-muted mb-0">Please enter below detail</h2>
+                                </div>
+                               
+                                <form class="js-validation-signin px-30" method="post" name="chngpwd" onSubmit="return valid();">
+                                    <div class="form-group row">
+                                        <div class="col-12">
+                                            <div class="form-material floating">
+                                                <input type="email" class="form-control" required="true" name="email">
+                                                <label for="login-username">Email Address</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-12">
+                                            <div class="form-material floating">
+                                                <input type="text" class="form-control"  name="mobile" required="true" maxlength="10" pattern="[0-9]+">
+                                                <label for="login-password">Mobile Number</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-12">
+                                            <div class="form-material floating">
+                                                <input class="form-control" type="password" name="newpassword" required="true"/>
+                                                <label for="login-password">New Password</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-12">
+                                            <div class="form-material floating">
+                                                <input class="form-control" type="password" name="confirmpassword" required="true"/>
+                                                <label for="login-password">Confirm Password</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-sm btn-hero btn-alt-primary" name="submit">
+                                            <i class="si si-login mr-10"></i> Reset
+                                        </button>
+                                        <div class="mt-30">
+                                            
+                                            <a class="link-effect text-muted mr-10 mb-5 d-inline-block" href="index.php">
+                                                 <i class="fa fa-user text-muted mr-5"></i> Sign In
+                                            </a>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- END Sign In Form -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Page Content -->
+            </main>
+            <!-- END Main Container -->
         </div>
+        <!-- END Page Container -->
 
-      </div>
+        <!-- Codebase Core JS -->
+        <script src="assets/js/core/jquery.min.js"></script>
+        <script src="assets/js/core/popper.min.js"></script>
+        <script src="assets/js/core/bootstrap.min.js"></script>
+        <script src="assets/js/core/jquery.slimscroll.min.js"></script>
+        <script src="assets/js/core/jquery.scrollLock.min.js"></script>
+        <script src="assets/js/core/jquery.appear.min.js"></script>
+        <script src="assets/js/core/jquery.countTo.min.js"></script>
+        <script src="assets/js/core/js.cookie.min.js"></script>
+        <script src="assets/js/codebase.js"></script>
 
-    </section>
+        <!-- Page JS Plugins -->
+        <script src="assets/js/plugins/jquery-validation/jquery.validate.min.js"></script>
 
-    <!--SIGNUP SECTION END--> 
-
-    
-
-  </div>
-
-  <!--MAIN END--> 
-
-  
-
-  <!--FOOTER START-->
-  <?php include('includes/footer.php');?>
-  <!--FOOTER END--> 
-
-</div>
-
-<script src="js/jquery-1.11.3.min.js"></script> 
-<script src="js/bootstrap.min.js"></script> 
-<script src="js/owl.carousel.min.js"></script> 
-<script src="js/jquery.velocity.min.js"></script> 
-<script src="js/jquery.kenburnsy.js"></script> 
-<script src="js/jquery.mCustomScrollbar.concat.min.js"></script> 
-<script src="js/jquery.noconflict.js"></script> 
-<script src="js/theme-scripts.js"></script> 
-<script src="js/form.js"></script> 
-<script src="js/custom.js"></script>
-
-</body>
-
+        <!-- Page JS Code -->
+        <script src="assets/js/pages/op_auth_signin.js"></script>
+    </body>
 </html>
-

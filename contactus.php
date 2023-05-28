@@ -2,55 +2,36 @@
 session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
-error_reporting(0);
 if (strlen($_SESSION['jpaid']==0)) {
   header('location:logout.php');
   } else{
-if(isset($_POST['submit']))
-{
-$adminid=$_SESSION['jpaid'];
-$cpassword=md5($_POST['currentpassword']);
-$newpassword=md5($_POST['newpassword']);
-$sql ="SELECT ID FROM tbladmin WHERE ID=:adminid and Password=:cpassword";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
+    if(isset($_POST['submit']))
+  {
 
-if($query -> rowCount() > 0)
-{
-$con="update tbladmin set Password=:newpassword where ID=:adminid";
-$chngpwd1 = $dbh->prepare($con);
-$chngpwd1-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-$chngpwd1->execute();
+$jpaid=$_SESSION['jpaid'];
+ $pagetitle=$_POST['pagetitle'];
+$pagedes=$_POST['pagedes'];
+$mobnum=$_POST['mobnum'];
+$email=$_POST['email'];
+$sql="update tblpages set PageTitle=:pagetitle,PageDescription=:pagedes,Email=:email,MobileNumber=:mobnum where  PageType='contactus'";
+$query=$dbh->prepare($sql);
+$query->bindParam(':pagetitle',$pagetitle,PDO::PARAM_STR);
+$query->bindParam(':pagedes',$pagedes,PDO::PARAM_STR);
+$query->bindParam(':email',$email,PDO::PARAM_STR);
+$query->bindParam(':mobnum',$mobnum,PDO::PARAM_STR);
+$query->execute();
+echo '<script>alert("Contact us has been updated")</script>';
 
-echo '<script>alert("Your password successully changed")</script>';
-} else {
-echo '<script>alert("Your current password is wrong")</script>';
 
-}
-}
- ?>
+  }
+  ?>
 <!doctype html>
  <html lang="en" class="no-focus"> <!--<![endif]-->
     <head>
- <title>Job Portal - Change Password</title>
+ <title>Job Portal - Update Contact Us</title>
 <link rel="stylesheet" id="css-main" href="assets/css/codebase.min.css">
-<script type="text/javascript">
-function checkpass()
-{
-if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
-{
-alert('New Password and Confirm Password field does not match');
-document.changepassword.confirmpassword.focus();
-return false;
-}
-return true;
-}   
-
-</script>
+<script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
+<script type="text/javascript">bkLib.onDomLoaded(nicEditors.allTextAreas);</script>
 </head>
     <body>
         <div id="page-container" class="sidebar-o sidebar-inverse side-scroll page-header-fixed main-content-narrow">
@@ -66,44 +47,63 @@ return true;
                 <div class="content">
                 
                     <!-- Register Forms -->
-                    <h2 class="content-heading">Change Password</h2>
+                    <h2 class="content-heading">Update Contact Us</h2>
                     <div class="row">
                         <div class="col-md-12">
                             <!-- Bootstrap Register -->
                             <div class="block block-themed">
                                 <div class="block-header bg-gd-emerald">
-                                    <h3 class="block-title">Change Password</h3>
-                                  
+                                    <h3 class="block-title">Update Contact Us</h3>
+                                    
                                 </div>
                                 <div class="block-content">
-                                    <form method="post" onsubmit="return checkpass();" name="changepassword">
+                                   
+                                    <form method="post">
+                                <?php
+
+$sql="SELECT * from  tblpages where PageType='contactus'";
+$query = $dbh -> prepare($sql);
+$query->execute();
+$results=$query->fetchAll(PDO::FETCH_OBJ);
+$cnt=1;
+if($query->rowCount() > 0)
+{
+foreach($results as $row)
+{               ?>        
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-username">Current Password:</label>
+                                            <label class="col-12" for="register1-email">Page Title:</label>
                                             <div class="col-12">
-                                                <input type="password" class="form-control" name="currentpassword" id="currentpassword"required='true'>
+                                                 <input type="text" name="pagetitle" id="pagetitle" required="true" value="<?php  echo $row->PageTitle;?>" class="form-control">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-email">New Password:</label>
+                                            <label class="col-12" for="register1-email">Email:</label>
                                             <div class="col-12">
-                                                 <input type="password" class="form-control" name="newpassword"  class="form-control" required="true">
+                                                 <input type="text" name="email" id="email" required="true" value="<?php  echo $row->Email;?>" class="form-control">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-password">Confirm Password:</label>
+                                            <label class="col-12" for="register1-email">Mobile Number:</label>
                                             <div class="col-12">
-                                                <input type="password" class="form-control"  name="confirmpassword" id="confirmpassword"  required='true'>
+                                                <input type="text" name="mobnum" id="mobnum" required="true" value="<?php  echo $row->MobileNumber;?>" class="form-control" maxlength="10" pattern="[0-9]+">
                                             </div>
                                         </div>
-                                      
+                                        <div class="form-group row">
+                                            <label class="col-12" for="register1-email">Page Description:</label>
+                                            <div class="col-12">
+                                                 <textarea type="text" name="pagedes" class="form-control" required='true'><?php  echo $row->PageDescription;?></textarea>
+                                            </div>
+                                        </div>
+                                        <?php $cnt=$cnt+1;}} ?>
                                         <div class="form-group row">
                                             <div class="col-12">
                                                 <button type="submit" class="btn btn-alt-success" name="submit">
-                                                    <i class="fa fa-plus mr-5"></i> Change
+                                                    <i class="fa fa-plus mr-5"></i> Update
                                                 </button>
                                             </div>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                             <!-- END Bootstrap Register -->

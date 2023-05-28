@@ -2,55 +2,34 @@
 session_start();
 error_reporting(0);
 include('includes/dbconnection.php');
-error_reporting(0);
 if (strlen($_SESSION['jpaid']==0)) {
   header('location:logout.php');
   } else{
-if(isset($_POST['submit']))
-{
-$adminid=$_SESSION['jpaid'];
-$cpassword=md5($_POST['currentpassword']);
-$newpassword=md5($_POST['newpassword']);
-$sql ="SELECT ID FROM tbladmin WHERE ID=:adminid and Password=:cpassword";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$query-> bindParam(':cpassword', $cpassword, PDO::PARAM_STR);
-$query-> execute();
-$results = $query -> fetchAll(PDO::FETCH_OBJ);
+    if(isset($_POST['submit']))
+  {
+    $adminid=$_SESSION['jpaid'];
+    $AName=$_POST['adminname'];
+  $mobno=$_POST['mobilenumber'];
+  $email=$_POST['email'];
+  $sql="update tbladmin set AdminName=:adminname,MobileNumber=:mobilenumber,Email=:email where ID=:aid";
+     $query = $dbh->prepare($sql);
+     $query->bindParam(':adminname',$AName,PDO::PARAM_STR);
+     $query->bindParam(':email',$email,PDO::PARAM_STR);
+     $query->bindParam(':mobilenumber',$mobno,PDO::PARAM_STR);
+     $query->bindParam(':aid',$adminid,PDO::PARAM_STR);
+$query->execute();
 
-if($query -> rowCount() > 0)
-{
-$con="update tbladmin set Password=:newpassword where ID=:adminid";
-$chngpwd1 = $dbh->prepare($con);
-$chngpwd1-> bindParam(':adminid', $adminid, PDO::PARAM_STR);
-$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-$chngpwd1->execute();
+        echo '<script>alert("Profile has been updated")</script>';
+     
 
-echo '<script>alert("Your password successully changed")</script>';
-} else {
-echo '<script>alert("Your current password is wrong")</script>';
-
-}
-}
- ?>
+  }
+  ?>
 <!doctype html>
  <html lang="en" class="no-focus"> <!--<![endif]-->
     <head>
- <title>Job Portal - Change Password</title>
+ <title>Job Portal - Admin Profile</title>
 <link rel="stylesheet" id="css-main" href="assets/css/codebase.min.css">
-<script type="text/javascript">
-function checkpass()
-{
-if(document.changepassword.newpassword.value!=document.changepassword.confirmpassword.value)
-{
-alert('New Password and Confirm Password field does not match');
-document.changepassword.confirmpassword.focus();
-return false;
-}
-return true;
-}   
 
-</script>
 </head>
     <body>
         <div id="page-container" class="sidebar-o sidebar-inverse side-scroll page-header-fixed main-content-narrow">
@@ -66,44 +45,68 @@ return true;
                 <div class="content">
                 
                     <!-- Register Forms -->
-                    <h2 class="content-heading">Change Password</h2>
+                    <h2 class="content-heading">Admin Profile</h2>
                     <div class="row">
                         <div class="col-md-12">
                             <!-- Bootstrap Register -->
                             <div class="block block-themed">
                                 <div class="block-header bg-gd-emerald">
-                                    <h3 class="block-title">Change Password</h3>
-                                  
+                                    <h3 class="block-title">Admin Profile</h3>
+                                   
                                 </div>
                                 <div class="block-content">
-                                    <form method="post" onsubmit="return checkpass();" name="changepassword">
+                                    <?php
+
+$sql="SELECT * from  tbladmin";
+$query = $dbh -> prepare($sql);
+$query->execute();
+$results=$query->fetchAll(PDO::FETCH_OBJ);
+$cnt=1;
+if($query->rowCount() > 0)
+{
+foreach($results as $row)
+{               ?>
+                                    <form method="post">
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-username">Current Password:</label>
+                                            <label class="col-12" for="register1-username">Admin Name:</label>
                                             <div class="col-12">
-                                                <input type="password" class="form-control" name="currentpassword" id="currentpassword"required='true'>
+                                                <input type="text" class="form-control" name="adminname" value="<?php  echo $row->AdminName;?>" required='true'>
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-email">New Password:</label>
+                                            <label class="col-12" for="register1-email">User Name:</label>
                                             <div class="col-12">
-                                                 <input type="password" class="form-control" name="newpassword"  class="form-control" required="true">
+                                                 <input type="text" class="form-control" name="username" value="<?php  echo $row->UserName;?>" readonly="true">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-12" for="register1-password">Confirm Password:</label>
+                                            <label class="col-12" for="register1-password">Email:</label>
                                             <div class="col-12">
-                                                <input type="password" class="form-control"  name="confirmpassword" id="confirmpassword"  required='true'>
+                                                <input type="email" class="form-control" name="email" value="<?php  echo $row->Email;?>" required='true'>
                                             </div>
                                         </div>
-                                      
+                                         <div class="form-group row">
+                                            <label class="col-12" for="register1-password">Contact Number:</label>
+                                            <div class="col-12">
+                                                 <input type="text" class="form-control" name="mobilenumber" value="<?php  echo $row->MobileNumber;?>" required='true' maxlength='10'>
+                                            </div>
+                                        </div>
+                                         <div class="form-group row">
+                                            <label class="col-12" for="register1-password">Admin Registration Date:</label>
+                                            <div class="col-12">
+                                                 <input type="text" class="form-control" id="email2" name="" value="<?php  echo $row->AdminRegdate;?>" readonly="true">
+                                            </div>
+                                        </div>
+                                      <?php $cnt=$cnt+1;}} ?>
                                         <div class="form-group row">
                                             <div class="col-12">
                                                 <button type="submit" class="btn btn-alt-success" name="submit">
-                                                    <i class="fa fa-plus mr-5"></i> Change
+                                                    <i class="fa fa-plus mr-5"></i> Update
                                                 </button>
                                             </div>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                             <!-- END Bootstrap Register -->
