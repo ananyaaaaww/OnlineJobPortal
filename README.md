@@ -22,3 +22,26 @@ process. Traditional recruitment methods such as print advertising and recruitme
 agencies can be costly, whereas online job portals provide a cost-effective alternative.
 The start dates and end dates for applications’ acceptance, the grace period, the job
 vacancies’ postings, modifying the privileges etc. are the special features of this system.
+
+
+
+SOFTWARE REQUIREMENTS
+• Operating System: Windows 7 or above, XAMPP
+• Programming Language: PHP5.6, PHP7.x
+• Front-end Development: HTML,CSS, AJAX, JAVASCRIPT
+• Back-end Development: MYSQL
+
+HARDWARE REQUIREMENTS
+• Processor – Pentium IV or above
+• RAM – 2 GB or more
+• Hard disk – 3 GB or more
+
+ER DIAGRAM
+<img width="420" alt="image" src="https://github.com/ananyaaaaww/OnlineJobPortal/assets/134645478/869776bc-ae03-41de-9db2-3a5ae048143a">
+SCHEMA DIAGRAM
+<img width="430" alt="image" src="https://github.com/ananyaaaaww/OnlineJobPortal/assets/134645478/26e57ca7-d62e-42d8-8cf6-bbd7e19e9e73">
+System block diagram of online job portal
+<img width="485" alt="image" src="https://github.com/ananyaaaaww/OnlineJobPortal/assets/134645478/2035a82a-8fbf-4990-9e39-bdef072c0d10">
+
+
+
