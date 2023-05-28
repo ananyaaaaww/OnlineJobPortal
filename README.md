@@ -36,10 +36,13 @@ HARDWARE REQUIREMENTS
 • RAM – 2 GB or more
 • Hard disk – 3 GB or more
 
+
 ER DIAGRAM
 <img width="420" alt="image" src="https://github.com/ananyaaaaww/OnlineJobPortal/assets/134645478/869776bc-ae03-41de-9db2-3a5ae048143a">
+
 SCHEMA DIAGRAM
 <img width="430" alt="image" src="https://github.com/ananyaaaaww/OnlineJobPortal/assets/134645478/26e57ca7-d62e-42d8-8cf6-bbd7e19e9e73">
+
 System block diagram of online job portal
 <img width="485" alt="image" src="https://github.com/ananyaaaaww/OnlineJobPortal/assets/134645478/2035a82a-8fbf-4990-9e39-bdef072c0d10">
 
